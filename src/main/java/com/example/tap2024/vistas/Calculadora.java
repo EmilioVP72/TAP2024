@@ -16,6 +16,10 @@ public class Calculadora extends Stage {
    private VBox vbox;
    private Scene escena;
    private String[] strTeclas = {"7", "8", "9", "*", "4", "5", "6", "/", "1", "2", "3", "+", "0", ".", "=", "-"};
+   private double num1;
+   private double num2;
+   private double resultado;
+   private String operador = "";
 
    private void CrearUI(){
        arrbtn = new Button[4][4];
@@ -51,8 +55,37 @@ public class Calculadora extends Stage {
         this.show();
    }
 
-   private void DetectarTecla(String tecla){
-       //txtPantalla.setText("");
-       txtPantalla.appendText(tecla);
-   }
+    private void DetectarTecla(String tecla) {
+
+       if (tecla.matches("[0-9.]")) {
+            txtPantalla.appendText(tecla);
+
+        } else if (tecla.matches("[+\\-*/]")) {
+            operador = tecla;
+            num1 = Double.parseDouble(txtPantalla.getText());
+            txtPantalla.clear();
+
+        } else if (tecla.equals("=")) {
+            num2 = Double.parseDouble(txtPantalla.getText());
+
+            switch (operador) {
+                case "+":
+                    resultado = num1 + num2;
+                    break;
+                case "-":
+                    resultado = num1 - num2;
+                    break;
+                case "*":
+                    resultado = num1 * num2;
+                    break;
+                case "/":
+                    resultado = num1 / num2;
+                    break;
+            }
+
+            txtPantalla.setText(String.valueOf(resultado));
+
+        }
+    }
+
 }
