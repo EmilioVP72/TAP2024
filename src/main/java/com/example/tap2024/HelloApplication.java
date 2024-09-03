@@ -14,6 +14,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.IOException;
 
+
+
 public class HelloApplication extends Application {
 
     private BorderPane bdpPrincipal;
@@ -38,6 +40,7 @@ public class HelloApplication extends Application {
         //FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         CrearUI8();
         Scene scene = new Scene(bdpPrincipal, 320, 240);
+        scene.getStylesheets().add(getClass().getResource("/Styles/Main.css").toExternalForm());
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.setMaximized(true);

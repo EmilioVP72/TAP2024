@@ -20,6 +20,7 @@ public class Calculadora extends Stage {
    private double num2;
    private double resultado;
    private String operador = "";
+   private Button clear;
 
    private void CrearUI(){
        arrbtn = new Button[4][4];
@@ -81,11 +82,13 @@ public class Calculadora extends Stage {
                 case "/":
                     resultado = num1 / num2;
                     break;
+
             }
 
             txtPantalla.setText(String.valueOf(resultado));
 
-        }
+
+       }
     }
 
 }
