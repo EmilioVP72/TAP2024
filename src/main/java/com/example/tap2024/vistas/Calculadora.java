@@ -12,6 +12,7 @@ public class Calculadora extends Stage {
 
    private Button[][] arrbtn;
    private TextField txtPantalla;
+   private  Button btnClear;
    private GridPane teclado;
    private VBox vbox;
    private Scene escena;
@@ -29,8 +30,12 @@ public class Calculadora extends Stage {
        txtPantalla.setEditable(false);
        teclado = new GridPane();
        CrearTeclado();
-       vbox = new VBox(txtPantalla, teclado);
+       btnClear = new Button("Clear");
+       btnClear.setOnAction(e -> txtPantalla.clear());
+       vbox = new VBox(txtPantalla, teclado, btnClear);
+       btnClear.setId("font-button");
        escena = new Scene(vbox,300,350);
+       escena.getStylesheets().add(getClass().getResource("/Styles/Calculadora.css").toExternalForm());
 
    }
 
@@ -47,6 +52,7 @@ public class Calculadora extends Stage {
            }
 
        }
+
    }
 
    public Calculadora(){
@@ -57,38 +63,57 @@ public class Calculadora extends Stage {
    }
 
     private void DetectarTecla(String tecla) {
-
-       if (tecla.matches("[0-9.]")) {
-            txtPantalla.appendText(tecla);
+        if (tecla.matches("[0-9.]")) {
+            txtPantalla.appendText(tecla);  // Se añade el número a la pantalla
 
         } else if (tecla.matches("[+\\-*/]")) {
-            operador = tecla;
-            num1 = Double.parseDouble(txtPantalla.getText());
-            txtPantalla.clear();
+            if (!txtPantalla.getText().isEmpty()) {
+                // Si ya hay un valor en pantalla, se guarda como num1 si no hay operador previo
+                if (operador.isEmpty()) {
+                    num1 = Double.parseDouble(txtPantalla.getText());
+                } else {
+                    // Si ya hay un operador, calculamos el resultado parcial
+                    num2 = Double.parseDouble(txtPantalla.getText());
+                    num1 = realizarOperacion(num1, num2, operador);
+                }
+            }
+            operador = tecla;  // Guardamos el operador actual
+            txtPantalla.clear(); // Limpiamos la pantalla para el siguiente número
 
         } else if (tecla.equals("=")) {
-            num2 = Double.parseDouble(txtPantalla.getText());
-
-            switch (operador) {
-                case "+":
-                    resultado = num1 + num2;
-                    break;
-                case "-":
-                    resultado = num1 - num2;
-                    break;
-                case "*":
-                    resultado = num1 * num2;
-                    break;
-                case "/":
-                    resultado = num1 / num2;
-                    break;
-
+            if (!txtPantalla.getText().isEmpty()) {
+                num2 = Double.parseDouble(txtPantalla.getText());
+                num1 = realizarOperacion(num1, num2, operador);
+                txtPantalla.setText(String.valueOf(num1));
+                operador = "";
             }
 
-            txtPantalla.setText(String.valueOf(resultado));
+        } else if (tecla.equals("Clear")) {
+            txtPantalla.clear();
+            num1 = 0;
+            num2 = 0;
+            operador = "";
+        }
+    }
 
-
-       }
+    private double realizarOperacion(double num1, double num2, String operador) {
+        switch (operador) {
+            case "+":
+                return num1 + num2;
+            case "-":
+                return num1 - num2;
+            case "*":
+                return num1 * num2;
+            case "/":
+                if (num2 != 0) {
+                    return num1 / num2;
+                } else {
+                    txtPantalla.setText("Error");  // Evitar la división por cero
+                    return 0;
+                }
+            default:
+                return num1;
+        }
     }
 
 }
