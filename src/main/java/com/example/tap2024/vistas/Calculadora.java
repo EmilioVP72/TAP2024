@@ -64,7 +64,13 @@ public class Calculadora extends Stage {
 
     private void DetectarTecla(String tecla) {
         if (tecla.matches("[0-9.]")) {
-            txtPantalla.appendText(tecla);  // Se añade el número a la pantalla
+            if ((!txtPantalla.getText().isEmpty()) && (tecla.isEmpty())) {
+                txtPantalla.appendText(tecla);
+
+            }else {
+                ;
+                txtPantalla.appendText(tecla);
+            }
 
         } else if (tecla.matches("[+\\-*/]")) {
             if (!txtPantalla.getText().isEmpty()) {
@@ -77,8 +83,8 @@ public class Calculadora extends Stage {
                     num1 = realizarOperacion(num1, num2, operador);
                 }
             }
-            operador = tecla;  // Guardamos el operador actual
-            txtPantalla.clear(); // Limpiamos la pantalla para el siguiente número
+            operador = tecla;
+            txtPantalla.clear();
 
         } else if (tecla.equals("=")) {
             if (!txtPantalla.getText().isEmpty()) {
@@ -86,6 +92,7 @@ public class Calculadora extends Stage {
                 num1 = realizarOperacion(num1, num2, operador);
                 txtPantalla.setText(String.valueOf(num1));
                 operador = "";
+
             }
 
         } else if (tecla.equals("Clear")) {
@@ -105,11 +112,12 @@ public class Calculadora extends Stage {
             case "*":
                 return num1 * num2;
             case "/":
-                if (num2 != 0) {
+
+                if (num2 == 0) {
                     return num1 / num2;
                 } else {
-                    txtPantalla.setText("Error");  // Evitar la división por cero
-                    return 0;
+
+                    txtPantalla.setText("infinity");
                 }
             default:
                 return num1;
