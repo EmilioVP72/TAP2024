@@ -12,6 +12,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.kordamp.bootstrapfx.BootstrapFX;
+import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 public class Loteria extends Stage{
 
@@ -25,6 +27,7 @@ public class Loteria extends Stage{
     private Scene escena;
     private String[] arrimagenes = {"barril.jpeg", "botella.jpeg", "catrin.jpeg", "chavorruco.jpeg", "concha.jpeg", "dorso.jpeg", "luchador.jpeg", "maceta.jpeg", "rosa.jpeg", "tacos.jpeg", "venado.jpeg"};
     private Button[][] arbtntab;
+    private Panel pnlmain;
 
     //MANDAR A LLAMAR
     public Loteria() {
@@ -56,10 +59,15 @@ public class Loteria extends Stage{
 
         CrearBaraja();
         hBoxmain= new HBox(vBoxtabla, vBoxbaraja);
+        pnlmain = new Panel("Loteria Mexicana");
+        pnlmain.getStyleClass().add("panel-success");
+        pnlmain.setBody(hBoxmain);
         hBoxmain.setSpacing(20);
         hBoxmain.setPadding(new Insets(20));
-        escena = new Scene(hBoxmain, 900, 800);
+        escena = new Scene(pnlmain, 900, 800);
 
+        escena.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());
+        escena.getStylesheets().add(getClass().getResource("/Styles/Lotera.css").toExternalForm());
     }
 
     private void CrearBaraja(){
@@ -69,6 +77,7 @@ public class Loteria extends Stage{
         imvbaraja.setFitHeight(400);
         imvbaraja.setFitWidth(300);
         btnstart = new Button("INICIAR JUEGO");
+        btnstart.getStyleClass().setAll("btn-sm", "btn-danger");
         vBoxbaraja = new VBox(lbltimer, imvbaraja, btnstart);
         vBoxbaraja.setSpacing(20);
 

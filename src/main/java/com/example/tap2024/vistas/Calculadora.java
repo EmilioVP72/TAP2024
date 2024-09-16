@@ -10,97 +10,140 @@ import javafx.stage.Stage;
 
 public class Calculadora extends Stage {
 
-   private Button[][] arrbtn;
-   private TextField txtPantalla;
-   private  Button btnClear;
-   private GridPane teclado;
-   private VBox vbox;
-   private Scene escena;
-   private String[] strTeclas = {"7", "8", "9", "*", "4", "5", "6", "/", "1", "2", "3", "+", "0", ".", "=", "-"};
-   private double num1;
-   private double num2;
-   private double resultado;
-   private String operador = "";
-   private Button clear;
+    private Button[][] arrbtn;
+    private TextField txtPantalla;
+    private Button btnClear;
+    private GridPane teclado;
+    private VBox vbox;
+    private Scene escena;
+    private String[] strTeclas = {"7", "8", "9", "*", "4", "5", "6", "/", "1", "2", "3", "+", "0", ".", "=", "-"};
+    private double num1 = 0;
+    private double num2 = 0;
+    private double resultado;
+    private boolean mostraresultado = false;
+    private String operador = "";
+    private boolean resultadoMostrado = false;
 
-   private void CrearUI(){
-       arrbtn = new Button[4][4];
-       txtPantalla = new TextField("");
-       txtPantalla.setAlignment(Pos.CENTER_RIGHT);
-       txtPantalla.setEditable(false);
-       teclado = new GridPane();
-       CrearTeclado();
-       btnClear = new Button("Clear");
-       btnClear.setOnAction(e -> txtPantalla.clear());
-       vbox = new VBox(txtPantalla, teclado, btnClear);
-       btnClear.setId("font-button");
-       escena = new Scene(vbox,300,350);
-       escena.getStylesheets().add(getClass().getResource("/Styles/Calculadora.css").toExternalForm());
+    private void CrearUI(){
+        arrbtn = new Button[4][4];
+        txtPantalla = new TextField("");
+        txtPantalla.setAlignment(Pos.CENTER_RIGHT);
+        txtPantalla.setEditable(false);
+        teclado = new GridPane();
+        CrearTeclado();
+        btnClear = new Button("Clear");
+        btnClear.setOnAction(e -> {
+            txtPantalla.clear();
+            resetearProceso();
+        });
+        vbox = new VBox(txtPantalla, teclado, btnClear);
+        btnClear.setId("font-button");
+        escena = new Scene(vbox, 300, 350);
+        escena.getStylesheets().add(getClass().getResource("/Styles/Calculadora.css").toExternalForm());
 
-   }
+    }
 
-   private void CrearTeclado(){
-       for (int i = 0; i < arrbtn.length; i++) {
-           for (int j = 0; j < arrbtn.length; j++) {
-               arrbtn[j][i] = new Button(strTeclas[4*i + j]);
-               arrbtn[j][i].setPrefSize(100,100);
-               int finalI = i;
-               int finalJ = j;
-               arrbtn[j][i].setOnAction(event -> DetectarTecla(strTeclas[4* finalI + finalJ]));
-               teclado.add(arrbtn[j][i],j,i);
+    private void CrearTeclado(){
+        for (int i = 0; i < arrbtn.length; i++) {
+            for (int j = 0; j < arrbtn.length; j++) {
+                arrbtn[j][i] = new Button(strTeclas[4 * i + j]);
+                arrbtn[j][i].setPrefSize(100, 100);
+                int finalI = i;
+                int finalJ = j;
+                arrbtn[j][i].setOnAction(event -> DetectarTecla(strTeclas[4 * finalI + finalJ]));
+                teclado.add(arrbtn[j][i], j, i);
+            }
+        }
+    }
 
-           }
-
-       }
-
-   }
-
-   public Calculadora(){
+    public Calculadora(){
         CrearUI();
         this.setTitle("Calculadora");
         this.setScene(escena);
         this.show();
-   }
+    }
 
     private void DetectarTecla(String tecla) {
         if (tecla.matches("[0-9.]")) {
-            if ((!txtPantalla.getText().isEmpty()) && (tecla.isEmpty())) {
-                txtPantalla.appendText(tecla);
-
-            }else {
-                ;
-                txtPantalla.appendText(tecla);
+            if (resultadoMostrado || txtPantalla.getText().contains("Error")) {
+                resetearProceso();  // Resetear si se mostró un resultado o error
             }
+
+            // Verificar si ya hay un punto en el número
+            if (tecla.equals(".") && txtPantalla.getText().contains(".")) {
+                txtPantalla.setText("Error: múltiples puntos");
+                resultadoMostrado = true;
+                return;
+            }
+
+            txtPantalla.appendText(tecla);
 
         } else if (tecla.matches("[+\\-*/]")) {
             if (!txtPantalla.getText().isEmpty()) {
-                // Si ya hay un valor en pantalla, se guarda como num1 si no hay operador previo
+                // Verifica si el valor actual no es solo un punto
+                if (txtPantalla.getText().equals(".")) {
+                    txtPantalla.setText("Error por punto");
+                    resultadoMostrado = true;
+                    return;
+                }
                 if (operador.isEmpty()) {
                     num1 = Double.parseDouble(txtPantalla.getText());
                 } else {
-                    // Si ya hay un operador, calculamos el resultado parcial
                     num2 = Double.parseDouble(txtPantalla.getText());
                     num1 = realizarOperacion(num1, num2, operador);
                 }
             }
             operador = tecla;
             txtPantalla.clear();
+            resultadoMostrado = false;
 
         } else if (tecla.equals("=")) {
             if (!txtPantalla.getText().isEmpty()) {
+                if (txtPantalla.getText().equals(".")) {
+                    txtPantalla.setText("Error por punto");
+                    mostraresultado = true;
+                    return;
+                }
+
+                if (operador.equals("")) {
+                    txtPantalla.setText(txtPantalla.getText());
+                    resultadoMostrado = true;
+                    return;
+                }
+
                 num2 = Double.parseDouble(txtPantalla.getText());
+
+                if (operador.equals("/") && num2 == 0) {
+                    txtPantalla.setText("Error: División por 0");
+                    resultadoMostrado = true;
+                    return;
+                }
+
                 num1 = realizarOperacion(num1, num2, operador);
+                mostraresultado = true;
                 txtPantalla.setText(String.valueOf(num1));
-                operador = "";
+                resultadoMostrado = true;
+
+
+            } else if (txtPantalla.getText().isEmpty()) {
+                txtPantalla.setText("Error: null");
+                resultadoMostrado = true;
+                return;
+            } {
 
             }
 
         } else if (tecla.equals("Clear")) {
-            txtPantalla.clear();
-            num1 = 0;
-            num2 = 0;
-            operador = "";
+            resetearProceso();
         }
+    }
+
+    private void resetearProceso() {
+        txtPantalla.clear();
+        num1 = 0;
+        num2 = 0;
+        operador = "";
+        resultadoMostrado = false;
     }
 
     private double realizarOperacion(double num1, double num2, String operador) {
@@ -112,16 +155,9 @@ public class Calculadora extends Stage {
             case "*":
                 return num1 * num2;
             case "/":
-
-                if (num2 == 0) {
-                    return num1 / num2;
-                } else {
-
-                    txtPantalla.setText("infinity");
-                }
+                return num1 / num2;
             default:
                 return num1;
         }
     }
-
 }
