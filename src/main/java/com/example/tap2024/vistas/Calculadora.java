@@ -64,11 +64,14 @@ public class Calculadora extends Stage {
     }
 
     private void DetectarTecla(String tecla) {
-        if (tecla.matches("[0-9.]")) {
-            if (resultadoMostrado || txtPantalla.getText().contains("Error")) {
-                resetearProceso();  // Resetear si se mostró un resultado o error
+        if (esError()) {
+            if (!tecla.matches("[0-9]") && !tecla.equals("Clear")) {
+                return;
             }
+            resetearProceso();
+        }
 
+        if (tecla.matches("[0-9.]")) {
             // Verificar si ya hay un punto en el número
             if (tecla.equals(".") && txtPantalla.getText().contains(".")) {
                 txtPantalla.setText("Error: múltiples puntos");
@@ -80,17 +83,18 @@ public class Calculadora extends Stage {
 
         } else if (tecla.matches("[+\\-*/]")) {
             if (!txtPantalla.getText().isEmpty()) {
-                // Verifica si el valor actual no es solo un punto
                 if (txtPantalla.getText().equals(".")) {
                     txtPantalla.setText("Error por punto");
                     resultadoMostrado = true;
                     return;
                 }
-                if (operador.isEmpty()) {
-                    num1 = Double.parseDouble(txtPantalla.getText());
-                } else {
+
+                if (!operador.isEmpty()) {
                     num2 = Double.parseDouble(txtPantalla.getText());
                     num1 = realizarOperacion(num1, num2, operador);
+                    txtPantalla.setText(String.valueOf(num1));
+                } else {
+                    num1 = Double.parseDouble(txtPantalla.getText());
                 }
             }
             operador = tecla;
@@ -120,22 +124,22 @@ public class Calculadora extends Stage {
                 }
 
                 num1 = realizarOperacion(num1, num2, operador);
-                mostraresultado = true;
                 txtPantalla.setText(String.valueOf(num1));
                 resultadoMostrado = true;
 
-
-            } else if (txtPantalla.getText().isEmpty()) {
+            } else {
                 txtPantalla.setText("Error: null");
                 resultadoMostrado = true;
                 return;
-            } {
-
             }
 
         } else if (tecla.equals("Clear")) {
             resetearProceso();
         }
+    }
+
+    private boolean esError() {
+        return txtPantalla.getText().startsWith("Error");
     }
 
     private void resetearProceso() {
