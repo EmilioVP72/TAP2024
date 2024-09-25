@@ -19,12 +19,12 @@ public class Calculadora extends Stage {
     private String[] strTeclas = {"7", "8", "9", "*", "4", "5", "6", "/", "1", "2", "3", "+", "0", ".", "=", "-"};
     private double num1 = 0;
     private double num2 = 0;
-    private double resultado;
-    private boolean mostraresultado = false;
+    private boolean muestraResultado = false;
     private String operador = "";
     private boolean resultadoMostrado = false;
+    private boolean esperandoNumero = false;
 
-    private void CrearUI(){
+    private void CrearUI() {
         arrbtn = new Button[4][4];
         txtPantalla = new TextField("");
         txtPantalla.setAlignment(Pos.CENTER_RIGHT);
@@ -43,7 +43,7 @@ public class Calculadora extends Stage {
 
     }
 
-    private void CrearTeclado(){
+    private void CrearTeclado() {
         for (int i = 0; i < arrbtn.length; i++) {
             for (int j = 0; j < arrbtn.length; j++) {
                 arrbtn[j][i] = new Button(strTeclas[4 * i + j]);
@@ -56,7 +56,7 @@ public class Calculadora extends Stage {
         }
     }
 
-    public Calculadora(){
+    public Calculadora() {
         CrearUI();
         this.setTitle("Calculadora");
         this.setScene(escena);
@@ -71,8 +71,12 @@ public class Calculadora extends Stage {
             resetearProceso();
         }
 
-        if (tecla.matches("[0-9.]")) {
-            // Verificar si ya hay un punto en el número
+        if (tecla.matches("[0-9.]") || (tecla.equals("-") && (txtPantalla.getText().isEmpty() || txtPantalla.getText().equals("-")))) {
+            if (resultadoMostrado) {
+                txtPantalla.clear();
+                resultadoMostrado = false;
+            }
+
             if (tecla.equals(".") && txtPantalla.getText().contains(".")) {
                 txtPantalla.setText("Error: múltiples puntos");
                 resultadoMostrado = true;
@@ -80,38 +84,39 @@ public class Calculadora extends Stage {
             }
 
             txtPantalla.appendText(tecla);
+            esperandoNumero = true;
 
         } else if (tecla.matches("[+\\-*/]")) {
             if (!txtPantalla.getText().isEmpty()) {
-                if (txtPantalla.getText().equals(".")) {
-                    txtPantalla.setText("Error por punto");
+                if (txtPantalla.getText().equals(".") || txtPantalla.getText().equals("-")) {
+                    txtPantalla.setText("Error por punto o signo");
                     resultadoMostrado = true;
                     return;
                 }
 
-                if (!operador.isEmpty()) {
+                if (!operador.isEmpty() && esperandoNumero) {
                     num2 = Double.parseDouble(txtPantalla.getText());
                     num1 = realizarOperacion(num1, num2, operador);
                     txtPantalla.setText(String.valueOf(num1));
-                } else {
+                } else if (esperandoNumero) {
                     num1 = Double.parseDouble(txtPantalla.getText());
                 }
             }
+
             operador = tecla;
             txtPantalla.clear();
             resultadoMostrado = false;
+            esperandoNumero = false;
 
         } else if (tecla.equals("=")) {
             if (!txtPantalla.getText().isEmpty()) {
-                if (txtPantalla.getText().equals(".")) {
-                    txtPantalla.setText("Error por punto");
-                    mostraresultado = true;
+                if (txtPantalla.getText().equals(".") || txtPantalla.getText().equals("-")) {
+                    txtPantalla.setText("Error por punto o signo");
+                    muestraResultado = true;
                     return;
                 }
 
-                if (operador.equals("")) {
-                    txtPantalla.setText(txtPantalla.getText());
-                    resultadoMostrado = true;
+                if (operador.isEmpty()) {
                     return;
                 }
 
@@ -126,11 +131,11 @@ public class Calculadora extends Stage {
                 num1 = realizarOperacion(num1, num2, operador);
                 txtPantalla.setText(String.valueOf(num1));
                 resultadoMostrado = true;
+                operador = "";
 
             } else {
                 txtPantalla.setText("Error: null");
                 resultadoMostrado = true;
-                return;
             }
 
         } else if (tecla.equals("Clear")) {
@@ -148,6 +153,7 @@ public class Calculadora extends Stage {
         num2 = 0;
         operador = "";
         resultadoMostrado = false;
+        esperandoNumero = false;
     }
 
     private double realizarOperacion(double num1, double num2, String operador) {

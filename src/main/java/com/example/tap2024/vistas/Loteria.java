@@ -30,13 +30,24 @@ public class Loteria extends Stage {
     private GridPane gptabla;
     private ImageView imvbaraja;
     private Scene escena;
-    private String[] arrimagenes = {"1.jpeg", "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg", "6.jpeg", "7.jpeg", "8.jpeg", "9.jpeg", "10.jpeg", "11.jpeg", "12.jpeg", "13.jpeg", "14.jpeg", "15.jpeg", "16.jpeg", "17.jpeg", "18.jpeg", "19.jpeg", "20.jpeg", "21.jpeg", "22.jpeg", "23.jpeg", "24.jpeg", "25.jpeg", "26.jpeg", "27.jpeg", "28.jpeg", "29.jpeg", "30.jpeg", "31.jpeg", "32.jpeg", "33.jpeg", "34.jpeg", "35.jpeg", "36.jpeg", "37.jpeg", "38.jpeg", "39.jpeg", "40.jpeg", "41.jpeg", "42.jpeg", "43.jpeg", "44.jpeg", "45.jpeg", "46.jpeg", "47.jpeg", "48.jpeg", "49.jpeg", "50.jpeg", "51.jpeg", "52.jpeg", "53.jpeg", "54.jpeg"};
-    private int indiceCartaBaraja = 0;  // Índice para rastrear la carta actual de la baraja
+    private String[] arrimagenes = {
+            "1.jpeg", "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg", "6.jpeg", "7.jpeg", "8.jpeg", "9.jpeg",
+            "10.jpeg", "11.jpeg", "12.jpeg", "13.jpeg", "14.jpeg", "15.jpeg", "16.jpeg", "17.jpeg",
+            "18.jpeg", "19.jpeg", "20.jpeg", "21.jpeg", "22.jpeg", "23.jpeg", "24.jpeg", "25.jpeg",
+            "26.jpeg", "27.jpeg", "28.jpeg", "29.jpeg", "30.jpeg", "31.jpeg", "32.jpeg", "33.jpeg",
+            "34.jpeg", "35.jpeg", "36.jpeg", "37.jpeg", "38.jpeg", "39.jpeg", "40.jpeg", "41.jpeg",
+            "42.jpeg", "43.jpeg", "44.jpeg", "45.jpeg", "46.jpeg", "47.jpeg", "48.jpeg", "49.jpeg",
+            "50.jpeg", "51.jpeg", "52.jpeg", "53.jpeg", "54.jpeg"
+    };
+    private String[][] arrTablillas = new String[5][16];  // 5 tablillas, 16 imágenes cada una
+    private int tablillaSeleccionada = 0;  // Índice para seleccionar la tablilla actual
     private int cartaActual = 0;  // Para rastrear la carta seleccionada
     private Timeline timeline;  // Temporizador para cambiar la carta automáticamente
     private Timeline timerActualizacion;  // Temporizador del reloj
     private Button[][] arbtntab;  // Botones en la tablilla
-    private LocalTime tiempoTranscurrido;  // Tiempo transcurrido en el juego
+    private LocalTime tiempoTranscurrido; // Tiempo transcurrido en el juego
+    private int tiempoRestante; // Representa segundos restantes para la próxima carta
+    private int indiceCartaBaraja = 0;  // Índice para la baraja
 
     private Panel pnlmain;
 
@@ -66,7 +77,7 @@ public class Loteria extends Stage {
         imvSig.setFitWidth(100);
 
         gptabla = new GridPane();
-        CrearTablilla();
+        CrearTablilla();  
         btnanterior = new Button();
         btnanterior.setGraphic(imvAnt);
         btnanterior.setOnAction(e -> cambiarTablilla(-1));
@@ -74,11 +85,12 @@ public class Loteria extends Stage {
         btnsiguiente.setGraphic(imvSig);
         btnsiguiente.setOnAction(e -> cambiarTablilla(1));
 
-        hboxbtns = new HBox(btnanterior, btnsiguiente);
-        vBoxtabla = new VBox(gptabla, hboxbtns);
+        hboxbtns = new HBox(10, btnanterior, btnsiguiente);
+        hboxbtns.getStyleClass().add("hbox-buttons");
+        vBoxtabla = new VBox(10, gptabla, hboxbtns);
 
         CrearBaraja();
-        hBoxmain = new HBox(vBoxtabla, vBoxbaraja);
+        hBoxmain = new HBox(20, vBoxtabla, vBoxbaraja);
         pnlmain = new Panel("Loteria Mexicana");
         pnlmain.getStyleClass().add("panel-success");
         pnlmain.setBody(hBoxmain);
@@ -93,7 +105,7 @@ public class Loteria extends Stage {
     private void CrearBaraja() {
         lbltimer = new Label("00:00");
         lbltimer.setFont(new Font("Arial", 30));
-        imvbaraja = new ImageView(new Image(getClass().getResource("/Images/dorso.jpeg").toExternalForm()));  // Carta inicial
+        imvbaraja = new ImageView(new Image(getClass().getResource("/Images/dorso.jpeg").toExternalForm()));
         imvbaraja.setFitHeight(400);
         imvbaraja.setFitWidth(300);
 
@@ -101,46 +113,55 @@ public class Loteria extends Stage {
         btnstart.getStyleClass().setAll("btn-sm", "btn-danger");
         btnstart.setOnAction(e -> iniciarJuego());
 
-        vBoxbaraja = new VBox(lbltimer, imvbaraja, btnstart);
+        lbltimer.setId("lbltimer");
+        btnstart.setId("btnstart");
+        vBoxbaraja = new VBox(20, lbltimer, imvbaraja, btnstart);
         vBoxbaraja.setSpacing(20);
+        vBoxbaraja.getStyleClass().add("vbox-baraja");
     }
 
     private void CrearTablilla() {
-        arbtntab = new Button[4][4];
-        // Generar solo 5 tablillas con imágenes aleatorias
-        for (int i = 0; i < 5; i++) {
+        for (int t = 0; t < 5; t++) {
             mezclarArreglo(arrimagenes);
-            actualizarTablilla();
+            for (int i = 0; i < 16; i++) {
+                arrTablillas[t][i] = arrimagenes[i];
+            }
         }
+
+        arbtntab = new Button[4][4];
+        actualizarTablilla();
     }
 
     private void cambiarTablilla(int direccion) {
-        cartaActual += direccion;
-        if (cartaActual < 0) {
-            cartaActual = arrimagenes.length - 4;
-        } else if (cartaActual > arrimagenes.length - 4) {
-            cartaActual = 0;
+        tablillaSeleccionada += direccion;
+        if (tablillaSeleccionada < 0) {
+            tablillaSeleccionada = 4;
+        } else if (tablillaSeleccionada > 4) {
+            tablillaSeleccionada = 0;
         }
+
         actualizarTablilla();
     }
 
     private void actualizarTablilla() {
         try {
-            gptabla.getChildren().clear();  // Limpiar la tabla de imágenes
-            int contador = cartaActual;
+            gptabla.getChildren().clear();
+            int contador = 0;
+            String[] tablillaActual = arrTablillas[tablillaSeleccionada];
+
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
-                    if (contador < arrimagenes.length) {
-                        Image img = new Image(getClass().getResource("/Images/" + arrimagenes[contador]).toExternalForm());
+                    if (contador < tablillaActual.length) {
+                        Image img = new Image(getClass().getResource("/Images/" + tablillaActual[contador]).toExternalForm());
                         ImageView imv = new ImageView(img);
                         imv.setFitWidth(100);
                         imv.setFitHeight(150);
+
                         Button btn = new Button();
                         btn.setGraphic(imv);
                         btn.setOnAction(e -> manejarClickBoton(btn, img));
                         arbtntab[i][j] = btn;
                         gptabla.add(btn, j, i);
-
                         contador++;
                     }
                 }
@@ -171,9 +192,11 @@ public class Loteria extends Stage {
                     break;
                 }
             }
+            if (!loteria) break;
         }
 
         if (loteria) {
+            detenerBaraja();
             mostrarMensajeLoteria();
         }
     }
@@ -184,6 +207,7 @@ public class Loteria extends Stage {
         alert.setHeaderText(null);
         alert.setContentText("¡Felicidades, has ganado la lotería!");
         alert.showAndWait();
+        detenerBaraja();
     }
 
     private void iniciarJuego() {
@@ -196,14 +220,11 @@ public class Loteria extends Stage {
         }
 
         try {
-
             btnstart.setDisable(true);
-
             btnanterior.setDisable(true);
             btnsiguiente.setDisable(true);
 
             mezclarArreglo(arrimagenes);
-
             indiceCartaBaraja = 0;
             actualizarBaraja();
 
@@ -212,8 +233,10 @@ public class Loteria extends Stage {
             timeline.setOnFinished(e -> finalizarJuego());
             timeline.play();
 
-            tiempoTranscurrido = LocalTime.of(0, 0, 0);
-            timerActualizacion = new Timeline(new KeyFrame(Duration.seconds(1), e -> actualizarReloj()));
+            tiempoRestante = 5;
+            actualizarReloj();
+
+            timerActualizacion = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> actualizarReloj()));
             timerActualizacion.setCycleCount(Timeline.INDEFINITE);
             timerActualizacion.play();
         } catch (Exception ex) {
@@ -225,9 +248,11 @@ public class Loteria extends Stage {
         try {
             indiceCartaBaraja++;
             if (indiceCartaBaraja >= arrimagenes.length) {
-                indiceCartaBaraja = 0;
+                finalizarJuego();
+            } else {
+                actualizarBaraja();
+                tiempoRestante = 5;
             }
-            actualizarBaraja();
         } catch (Exception ex) {
             System.out.println("Error al avanzar la carta: " + ex.getMessage());
         }
@@ -243,23 +268,63 @@ public class Loteria extends Stage {
     }
 
     private void actualizarReloj() {
-        tiempoTranscurrido = tiempoTranscurrido.plusSeconds(1);
-        lbltimer.setText(tiempoTranscurrido.format(DateTimeFormatter.ofPattern("mm:ss")));
+        if (tiempoRestante > 0) {
+            tiempoRestante--;
+        } else {
+            tiempoRestante = 5;
+            avanzarCarta();
+        }
+        lbltimer.setText(String.format("00:%02d", tiempoRestante));
     }
 
     private void finalizarJuego() {
-        timeline.stop();
-        timerActualizacion.stop();
-        mostrarMensajeFinal();
+        if (timeline != null) {
+            timeline.stop();
+        }
+        if (timerActualizacion != null) {
+            timerActualizacion.stop();
+        }
 
+        if (!verificarJuegoTerminado()) {
+            mostrarMensajeIntentarloDeNuevo();
+        }
     }
 
-    private void mostrarMensajeFinal() {
+
+    private boolean verificarJuegoTerminado() {
+        for (Button[] row : arbtntab) {
+            for (Button btn : row) {
+                if (!btn.isDisabled()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    private void mostrarMensajeIntentarloDeNuevo() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Juego Terminado");
         alert.setHeaderText(null);
-        alert.setContentText("¡El juego ha terminado!");
+        alert.setContentText("No has bloqueado todas las imágenes. ¡Inténtalo de nuevo!");
         alert.showAndWait();
-        btnstart.setDisable(false);
     }
+
+
+    private void detenerBaraja() {
+        if (timeline != null) {
+            timeline.stop();
+        }
+
+        if (timerActualizacion != null) {
+            timerActualizacion.stop();
+        }
+
+        btnstart.setDisable(false);
+        btnanterior.setDisable(false);
+        btnsiguiente.setDisable(false);
+
+    }
+
 }
