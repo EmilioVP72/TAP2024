@@ -179,8 +179,8 @@ public class Loteria extends Stage {
             Image imgBaraja = imvbaraja.getImage();
             if (imgBoton.getUrl().equals(imgBaraja.getUrl())) {
                 btn.setDisable(true);
-                contadorCartasBloqueadas++; // Incrementar el contador
-                verificarJuegoTerminado(); // Verificar si el juego ha terminado
+                contadorCartasBloqueadas++;
+                verificarJuegoTerminado();
             }
         } catch (Exception ex) {
             System.out.println("Error al manejar el clic del botón: " + ex.getMessage());
@@ -193,7 +193,7 @@ public class Loteria extends Stage {
         alert.setHeaderText(null);
         alert.setContentText("¡Felicidades, has ganado la lotería!");
         alert.showAndWait();
-        detenerBaraja();
+        reiniciarJuego();
     }
 
     private void mostrarMensajeIntentarloDeNuevo() {
@@ -202,8 +202,8 @@ public class Loteria extends Stage {
         alert.setHeaderText(null);
         alert.setContentText("No has bloqueado todas las imágenes. ¡Inténtalo de nuevo!");
         alert.showAndWait();
+        reiniciarJuego();
     }
-
 
     private void iniciarJuego() {
         if (timeline != null) {
@@ -280,12 +280,11 @@ public class Loteria extends Stage {
             timerActualizacion.stop();
         }
 
-        // Aseguramos que el código se ejecute después de las animaciones
         Platform.runLater(() -> {
             if (contadorCartasBloqueadas == 16) {
-                mostrarMensajeLoteria();  // Si se bloquearon las 16 cartas
+                mostrarMensajeLoteria();
             } else {
-                mostrarMensajeIntentarloDeNuevo();  // Si no se bloquearon todas
+                mostrarMensajeIntentarloDeNuevo();
             }
         });
     }
@@ -313,7 +312,23 @@ public class Loteria extends Stage {
         btnanterior.setDisable(false);
         btnsiguiente.setDisable(false);
 
-        contadorCartasBloqueadas = 0; // Reiniciar contador
+        contadorCartasBloqueadas = 0;
+    }
+
+    private void reiniciarJuego() {
+        detenerBaraja();
+        contadorCartasBloqueadas = 0;
+        for (Button[] row : arbtntab) {
+            for (Button btn : row) {
+                btn.setDisable(false);
+            }
+        }
+        btnstart.setDisable(false);
+        btnanterior.setDisable(false);
+        btnsiguiente.setDisable(false);
+
+        imvbaraja.setImage(new Image(getClass().getResource("/Images/dorso.jpeg").toExternalForm()));
+        lbltimer.setText("00:00");
     }
 
 
