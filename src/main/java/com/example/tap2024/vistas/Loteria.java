@@ -2,6 +2,7 @@ package com.example.tap2024.vistas;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -48,6 +49,8 @@ public class Loteria extends Stage {
     private LocalTime tiempoTranscurrido; // Tiempo transcurrido en el juego
     private int tiempoRestante; // Representa segundos restantes para la próxima carta
     private int indiceCartaBaraja = 0;  // Índice para la baraja
+    private int contadorCartasBloqueadas = 0; // Contador de cartas bloqueadas
+
 
     private Panel pnlmain;
 
@@ -77,7 +80,7 @@ public class Loteria extends Stage {
         imvSig.setFitWidth(100);
 
         gptabla = new GridPane();
-        CrearTablilla();  
+        CrearTablilla();
         btnanterior = new Button();
         btnanterior.setGraphic(imvAnt);
         btnanterior.setOnAction(e -> cambiarTablilla(-1));
@@ -176,28 +179,11 @@ public class Loteria extends Stage {
             Image imgBaraja = imvbaraja.getImage();
             if (imgBoton.getUrl().equals(imgBaraja.getUrl())) {
                 btn.setDisable(true);
-                verificarLoteria();
+                contadorCartasBloqueadas++; // Incrementar el contador
+                verificarJuegoTerminado(); // Verificar si el juego ha terminado
             }
         } catch (Exception ex) {
             System.out.println("Error al manejar el clic del botón: " + ex.getMessage());
-        }
-    }
-
-    private void verificarLoteria() {
-        boolean loteria = true;
-        for (Button[] row : arbtntab) {
-            for (Button btn : row) {
-                if (!btn.isDisabled()) {
-                    loteria = false;
-                    break;
-                }
-            }
-            if (!loteria) break;
-        }
-
-        if (loteria) {
-            detenerBaraja();
-            mostrarMensajeLoteria();
         }
     }
 
@@ -209,6 +195,15 @@ public class Loteria extends Stage {
         alert.showAndWait();
         detenerBaraja();
     }
+
+    private void mostrarMensajeIntentarloDeNuevo() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Juego Terminado");
+        alert.setHeaderText(null);
+        alert.setContentText("No has bloqueado todas las imágenes. ¡Inténtalo de nuevo!");
+        alert.showAndWait();
+    }
+
 
     private void iniciarJuego() {
         if (timeline != null) {
@@ -236,7 +231,7 @@ public class Loteria extends Stage {
             tiempoRestante = 5;
             actualizarReloj();
 
-            timerActualizacion = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> actualizarReloj()));
+            timerActualizacion = new Timeline(new KeyFrame(Duration.seconds(1), e -> actualizarReloj()));
             timerActualizacion.setCycleCount(Timeline.INDEFINITE);
             timerActualizacion.play();
         } catch (Exception ex) {
@@ -285,30 +280,23 @@ public class Loteria extends Stage {
             timerActualizacion.stop();
         }
 
-        if (!verificarJuegoTerminado()) {
-            mostrarMensajeIntentarloDeNuevo();
-        }
+        // Aseguramos que el código se ejecute después de las animaciones
+        Platform.runLater(() -> {
+            if (contadorCartasBloqueadas == 16) {
+                mostrarMensajeLoteria();  // Si se bloquearon las 16 cartas
+            } else {
+                mostrarMensajeIntentarloDeNuevo();  // Si no se bloquearon todas
+            }
+        });
     }
-
 
     private boolean verificarJuegoTerminado() {
-        for (Button[] row : arbtntab) {
-            for (Button btn : row) {
-                if (!btn.isDisabled()) {
-                    return false;
-                }
-            }
+        if (contadorCartasBloqueadas == 16) {
+            Platform.runLater(() -> mostrarMensajeLoteria());
+            detenerBaraja();
+            return true;
         }
-        return true;
-    }
-
-
-    private void mostrarMensajeIntentarloDeNuevo() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Juego Terminado");
-        alert.setHeaderText(null);
-        alert.setContentText("No has bloqueado todas las imágenes. ¡Inténtalo de nuevo!");
-        alert.showAndWait();
+        return false;
     }
 
 
@@ -325,6 +313,8 @@ public class Loteria extends Stage {
         btnanterior.setDisable(false);
         btnsiguiente.setDisable(false);
 
+        contadorCartasBloqueadas = 0; // Reiniciar contador
     }
+
 
 }

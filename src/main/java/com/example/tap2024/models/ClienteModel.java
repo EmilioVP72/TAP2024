@@ -1,5 +1,9 @@
 package com.example.tap2024.models;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -60,8 +64,6 @@ public class ClienteModel {
             e.printStackTrace();
 
         }
-
-
     }
 
     public void Delete(){
@@ -75,14 +77,27 @@ public class ClienteModel {
 
     }
 
-    public void Select(){
+    public ObservableList<ClienteModel> Select(){
+        ClienteModel objCte;
         String query = "select * from cliente";
+        ObservableList<ClienteModel> listaCliente = FXCollections.observableArrayList();
         try {
             Statement stmt = Conexion.connection.createStatement();
-            stmt.executeUpdate(query);
+            ResultSet res = stmt.executeQuery(query);
+            while (res.next()) {
+                objCte = new ClienteModel();
+                objCte.id_cliente = res.getInt(0);
+                objCte.cliente = res.getString(1);
+                objCte.telefono = res.getString(2);
+                objCte.correo = res.getString(3);
+                listaCliente.add(objCte);
+
+            }
         }catch (Exception e) {
             e.printStackTrace();
         }
+
+        return listaCliente;
 
     }
 }

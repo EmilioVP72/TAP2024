@@ -4,21 +4,21 @@
 
 /* Centramos los botones de Anterior y Siguiente */
 .hbox-buttons {
-    -fx-alignment: center; /* Centrar horizontalmente el HBox */
+    -fx-alignment: center;
 }
 
 /* Centramos el temporizador, la baraja y el botón de iniciar juego */
 .vbox-baraja {
-    -fx-alignment: center; /* Centrar elementos en el VBox */
+    -fx-alignment: center;
 }
 
 /* Estilo para el temporizador */
 #lbltimer {
     -fx-font-size: 30px;
-    -fx-text-alignment: center; /* Asegurar que el texto del timer esté centrado */
+    -fx-text-alignment: center;
 }
 
 /* Estilo para el botón de iniciar juego */
 #btnstart {
-    -fx-alignment: center; /* Centrar el botón */
+    -fx-alignment: center;
 }

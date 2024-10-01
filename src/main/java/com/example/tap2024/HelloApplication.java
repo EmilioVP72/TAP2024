@@ -2,6 +2,7 @@ package com.example.tap2024;
 
 import com.example.tap2024.models.Conexion;
 import com.example.tap2024.vistas.Calculadora;
+import com.example.tap2024.vistas.ListaClientes;
 import com.example.tap2024.vistas.Loteria;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -23,17 +24,20 @@ public class HelloApplication extends Application {
     private BorderPane bdpPrincipal;
     private MenuBar mnbPrincipal;
     private Menu menComp1, menComp2, menSalir;
-    private MenuItem mitCalculadora, mitLoteria;
+    private MenuItem mitCalculadora, mitLoteria, mitSpotify;
 
     public void CrearUI8(){
 
         mitCalculadora = new MenuItem("Calculadora");
         mitLoteria = new MenuItem("Loteria");
+        mitSpotify = new MenuItem("Spotify");
         mitCalculadora.setOnAction(actionEvent -> new Calculadora());
         mitLoteria.setOnAction(actionEvent -> new Loteria());
+        mitSpotify.setOnAction(actionEvent -> new ListaClientes());
         menComp1 = new Menu("Competencia 1");
         menComp1.getItems().add(mitCalculadora);
         menComp1.getItems().add(mitLoteria);
+        menComp1.getItems().add(mitSpotify);
         mnbPrincipal = new MenuBar(menComp1);
         bdpPrincipal = new BorderPane();
         bdpPrincipal.setTop(mnbPrincipal);
