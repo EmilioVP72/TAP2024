@@ -55,7 +55,7 @@ public class BuscaMinas extends Stage {
 
         vbox = new VBox(tf, hbox, grdpane);
 
-        escena = new Scene(vbox, 490, 450);
+        escena = new Scene(vbox, 485, 490);
         this.setScene(escena);
         this.setTitle("BuscaMinas");
         this.show();
@@ -63,6 +63,7 @@ public class BuscaMinas extends Stage {
 
     private void CrearUI(GridPane gridPane) {
         gridPane.getChildren().clear();
+        gridPane.setStyle("-fx-background-color: #e0f7fa;"); // Fondo color azul claro
         gridButtons = new Button[size][size];
         BombasMatriz = new boolean[size][size];
         ReveleacionMatriz = new boolean[size][size];
@@ -74,6 +75,9 @@ public class BuscaMinas extends Stage {
             for (int col = 0; col < size; col++) {
                 Button button = new Button();
                 button.setMinSize(40, 40);
+                button.setStyle("-fx-background-color: #80deea; -fx-border-color: #01579b; -fx-border-width: 2px;");
+                button.setTextFill(javafx.scene.paint.Color.web("#01579b"));
+
                 final int r = row;
                 final int c = col;
 
@@ -147,8 +151,9 @@ public class BuscaMinas extends Stage {
 
         if (bombsAround > 0) {
             gridButtons[row][col].setText(String.valueOf(bombsAround));
+            gridButtons[row][col].setStyle("-fx-background-color: #4fc3f7; -fx-text-fill: #01579b;");
         } else {
-            gridButtons[row][col].setStyle("-fx-background-color: #eaad6c;");
+            gridButtons[row][col].setStyle("-fx-background-color: #b3e5fc;");
             gridButtons[row][col].setDisable(true);
 
             for (int i = -1; i <= 1; i++) {
@@ -182,7 +187,7 @@ public class BuscaMinas extends Stage {
             for (int col = 0; col < size; col++) {
                 if (BombasMatriz[row][col]) {
                     gridButtons[row][col].setText("💣");
-                    gridButtons[row][col].setStyle("-fx-background-color: red;");
+                    gridButtons[row][col].setStyle("-fx-background-color: #d32f2f; -fx-text-fill: white;"); // Fondo rojo para bombas
                 }
             }
         }

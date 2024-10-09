@@ -55,15 +55,18 @@ public class ClienteModel {
             }
     }
 
-    public void Insert(){
+    public int Insert(){
+        int rowCount;
         String query = "Insert into cliente(cliente,telefono,correo)" + " values('"+this.cliente+"', '"+this.telefono+"', '"+this.correo+"')";
         try {
             Statement stmt = Conexion.connection.createStatement();
-            stmt.executeUpdate(query);
+            rowCount = stmt.executeUpdate(query);
         }catch (SQLException e){
+            rowCount = 0;
             e.printStackTrace();
 
         }
+        return rowCount;
     }
 
     public void Delete(){
@@ -86,10 +89,10 @@ public class ClienteModel {
             ResultSet res = stmt.executeQuery(query);
             while (res.next()) {
                 objCte = new ClienteModel();
-                objCte.id_cliente = res.getInt(0);
-                objCte.cliente = res.getString(1);
-                objCte.telefono = res.getString(2);
-                objCte.correo = res.getString(3);
+                objCte.id_cliente = res.getInt(1);
+                objCte.cliente = res.getString(2);
+                objCte.telefono = res.getString(3);
+                objCte.correo = res.getString(4);
                 listaCliente.add(objCte);
 
             }
