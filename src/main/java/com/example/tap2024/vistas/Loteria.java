@@ -223,7 +223,7 @@ public class Loteria extends Stage {
             indiceCartaBaraja = 0;
             actualizarBaraja();
 
-            timeline = new Timeline(new KeyFrame(Duration.seconds(5), e -> avanzarCarta()));
+            timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> avanzarCarta()));
             timeline.setCycleCount(arrimagenes.length);
             timeline.setOnFinished(e -> finalizarJuego());
             timeline.play();
