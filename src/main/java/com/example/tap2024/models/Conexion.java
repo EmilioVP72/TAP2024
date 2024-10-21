@@ -7,8 +7,7 @@ public class Conexion {
     static private String DB = "Musica";
     static private String user = "boss";
     static private String pwd = "123";
-    static private String host = "10.39.165.90" +
-            "";
+    static private String host = "10.39.165.90" + "";
     static private String port = "3306";
     public static Connection connection;
 
