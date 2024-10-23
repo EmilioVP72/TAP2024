@@ -34,7 +34,7 @@ public class HelloApplication extends Application {
         mitCarreras = new MenuItem("Carreras");
         mitCalculadora.setOnAction(actionEvent -> new Calculadora());
         mitLoteria.setOnAction(actionEvent -> new Loteria());
-        mitSpotify.setOnAction(actionEvent -> new ListaClientes());
+        mitSpotify.setOnAction(actionEvent -> new Login());
         mitbuscaminas.setOnAction(actionEvent -> new BuscaMinas());
         mitCarreras.setOnAction(actionEvent -> new PistaCorredores());
         menComp1 = new Menu("Competencia 1");

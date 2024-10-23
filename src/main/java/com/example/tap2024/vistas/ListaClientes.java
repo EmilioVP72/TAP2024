@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -15,9 +16,12 @@ import java.nio.Buffer;
 
 public class ListaClientes extends Stage {
 
+    private Label lblCliente;
+    private Button btnCliente;
     private TableView<ClienteModel> tbvClientes;
     private ToolBar tlbMenu;
-    private VBox vbox;
+    private VBox vbox, vboxPrincipal, vboxClientes;
+    private HBox hboxSecundario1, hboxSecundario2;
     private Scene escena;;
 
     public ListaClientes(){
@@ -28,6 +32,7 @@ public class ListaClientes extends Stage {
     }
 
     private void CrearUI() {
+
         tlbMenu = new ToolBar();
         ImageView imv = new ImageView(getClass().getResource("/Images/siguiente.png").toExternalForm());
         Button btn_add_cliente = new Button();
